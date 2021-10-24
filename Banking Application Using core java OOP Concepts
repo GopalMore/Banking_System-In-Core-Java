@@ -1,0 +1,281 @@
+import java.util.Scanner;
+import java.sql.*;
+class AccountDetails
+{
+  String name;
+  double balance;
+  long accNo;
+  Scanner sc = new Scanner(System.in);
+  void addUser()
+  {
+ try
+      {
+          Class.forName("com.mysql.jdbc.Driver");
+          System.out.println("Driver Loaded..");
+
+         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank","root","");
+          System.out.println("Connection Established..");
+         
+         
+   System.out.println("Enter the your  name :- ");
+   name=sc.nextLine();
+   System.out.println("Enter your Account no :-");
+   accNo=sc.nextLong();
+   System.out.println("Enter your Balance :- ");
+   balance=sc.nextDouble();
+   
+   PreparedStatement ps=con.prepareStatement("insert into ac values(?,?,?)");
+   ps.setString(1, name);
+   ps.setLong(3, accNo);
+   ps.setDouble(2, balance);
+  int i= ps.executeUpdate();
+  if(i<=1)
+  {
+  System.out.println("Record Inserted Successfully..!!");
+  }
+  else
+  {
+  System.out.println("Record Failed to Insert..!!");
+  }
+   
+}
+catch(Exception e)
+{
+   System.err.println(e);
+   e.printStackTrace();
+}
+}
+ 
+  void viewUser()
+  {
+ try
+      {
+          Class.forName("com.mysql.jdbc.Driver");
+          System.out.println("Info Loaded..");
+
+         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank","root","");
+         
+     
+          System.out.println("Enter account number accNo : ");
+          Long acc_No=sc.nextLong();
+         
+          Statement stmt=con.createStatement();
+
+          ResultSet rs=stmt.executeQuery("select * from ac where accNo='"+acc_No+"'");
+
+          while(rs.next())
+          {
+              System.out.println("Fetching Record..");
+              System.out.println("accNo : "+rs.getLong(3)+"\nName : "+rs.getString(1)+"\nBalance : "+rs.getDouble(2));
+             
+          }
+      }
+      catch(Exception e)
+      {
+          System.err.println(e);
+          e.printStackTrace();
+      }
+  }
+ 
+ void checkBalance()
+  {
+try
+     {
+         Class.forName("com.mysql.jdbc.Driver");
+         System.out.println("Driver Loaded..");
+
+        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank","root","");
+         System.out.println("Connection Established..");
+         
+         System.out.println("Enter Customer AccNo : ");
+         long acc_No=sc.nextLong();
+         
+         Statement stmt=con.createStatement();
+
+         ResultSet rs=stmt.executeQuery("select * from ac where accNo='"+acc_No+"'");
+
+         while(rs.next())
+         {
+             System.out.println("Fetching Record..");
+             System.out.println("accNo : "+rs.getLong(3)+"\nName : "+rs.getString(1)+"\nBalance : "+rs.getDouble(2));
+           
+         }
+     }
+     catch(Exception e)
+     {
+         System.err.println(e);
+         e.printStackTrace();
+     }
+    }
+ }
+
+class AmountDeposit extends AccountDetails
+{
+  double amount;
+  void deposit()
+  {
+ try
+      {
+          Class.forName("com.mysql.jdbc.Driver");
+          System.out.println("Driver Loaded..");
+
+         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank","root","");
+          System.out.println("Connection Established..");
+          System.out.println("Enter Customer AccNo : ");
+          long acc_No=sc.nextLong();
+         
+          Statement stmt=con.createStatement();
+
+          ResultSet rs=stmt.executeQuery("select * from ac where accNo='"+acc_No+"'");
+
+          while(rs.next())
+          {
+              System.out.println("Fetching Record..");
+              System.out.println("accNo : "+rs.getLong(3)+"\nName : "+rs.getString(1)+"\nBalance : "+rs.getDouble(2));
+             
+          }
+         
+   
+   PreparedStatement ps=con.prepareStatement("update ac set balance=? where accNo=?");
+   System.out.println("Enter the amount to deposite...");
+   amount=sc.nextDouble();
+   
+    if(amount > 0)
+    {
+       balance += amount;
+       System.out.println("Current Balance="+balance);
+    }
+    else
+    {
+    System.out.println("Negative value can not be deposite");  
+    }
+    ps.setLong(2, accNo);
+    ps.setDouble(1, balance);
+   int i= ps.executeUpdate();
+   if(i<=1)
+   {
+    System.out.println("Record Inserted Successfully..!!");
+   }
+   else
+   {
+    System.out.println("Record Failed to Insert..!!");
+   }
+     
+ }
+ catch(Exception e)
+ {
+    System.err.println(e);
+    e.printStackTrace();
+ }
+  }
+ 
+}
+class AmountWithdraw extends AmountDeposit
+{
+  double amoumt,bal;
+  void withdraw()
+  {
+ try
+      {
+          Class.forName("com.mysql.jdbc.Driver");
+          System.out.println("Driver Loaded..");
+
+         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank","root","");
+          System.out.println("Connection Established..");
+          System.out.println("Enter Customer AccNo : ");
+          long acc_No=sc.nextLong();
+         
+          Statement stmt=con.createStatement();
+
+          ResultSet rs=stmt.executeQuery("select * from ac where accNo='"+acc_No+"'");
+
+          while(rs.next())
+          {
+              System.out.println("Fetching Record..");
+              System.out.println("accNo : "+rs.getLong(3)+"\nName : "+rs.getString(1)+"\nBalance : "+rs.getDouble(2));
+             
+          }
+         
+   
+   PreparedStatement ps=con.prepareStatement("update ac set balance=? where accNo=?");
+   System.out.println("Enter the amount to deposite...");
+   amount=sc.nextDouble();
+   
+   if(amount > 0)
+   {
+   bal=balance;
+   if(balance>=4999)
+   {
+    if((bal -= amount) < 0)
+    {
+      System.out.println("Cannot Withdraw");
+     }
+     else
+    {
+   balance -= amount;
+   System.out.println("Current Balance"+balance);
+    }
+   }
+   else
+   {
+ 
+   System.out.println("Balance can not be withdraw");
+   }
+   }
+     else
+     {
+  System.out.println("Can not withdraw");
+      }
+   ps.setLong(2, accNo);
+   ps.setDouble(1, balance);
+  int i= ps.executeUpdate();
+  if(i<=1)
+  {
+  System.out.println("Record Inserted Successfully..!!");
+  }
+  else
+  {
+  System.out.println("Record Failed to Insert..!!");
+  }
+   
+}
+catch(Exception e)
+{
+   System.err.println(e);
+   e.printStackTrace();
+}
+}
+}
+  class Banking
+  {
+  public static void main(String k[])
+  {
+     int ch;
+     Scanner sc1 = new Scanner(System.in);
+     AmountWithdraw obj = new AmountWithdraw();
+     obj.addUser();
+     obj.viewUser();
+     do
+     {
+     System.out.println("1. Veiw user information");
+     System.out.println("2. Amount Deposite");
+     System.out.println("3. Amount withdraw");
+     System.out.println("4. Check the balance");
+     System.out.println("Enter your choice");
+     ch=sc1.nextInt();
+     switch(ch)
+     {
+        case 1:obj.viewUser();
+               break;
+        case 2: obj.deposit();
+                break;
+        case 3: obj.withdraw();
+                break;
+        case 4: obj.checkBalance();
+                break;
+        default: System.out.println("your choice is wronge");
+                break;
+      }
+      }while(ch != 4);
+   }
+  }
